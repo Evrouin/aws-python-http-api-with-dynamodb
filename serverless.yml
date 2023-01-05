@@ -1,0 +1,50 @@
+service: loyalty-cards
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: ap-southeast-1
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /hello
+          method: get
+  create:
+    handler: loyalty-cards/create.handler
+    events:
+      - http:
+          path: /loyalty-cards
+          method: post
+  fetch:
+    handler: loyalty-cards/fetch.handler
+    events:
+      - http:
+          path: /loyalty-cards
+          method: get
+  fetch_card:
+    handler: loyalty-cards/fetch_card.handler
+    events:
+      - http:
+          path: /loyalty-cards/{card_number}
+          method: get
+
+resources:
+  Resources:
+    LoyaltyCardsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: loyalty-cards
+        AttributeDefinitions:
+          - AttributeName: card_number
+            AttributeType: S
+        KeySchema:
+          - AttributeName: card_number
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
