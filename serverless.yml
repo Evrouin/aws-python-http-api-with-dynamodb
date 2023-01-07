@@ -32,6 +32,24 @@ functions:
       - http:
           path: /loyalty-cards/{card_number}
           method: get
+  create_card:
+    handler: loyalty-cards/create_batch_card.handler
+    events:
+      - s3:
+          bucket: loyalty-card-upload-2
+          event: s3:ObjectCreated:*
+          rules:
+            - suffix: .csv
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - s3:GetObject
+        Resource: arn:aws:s3:::loyalty-card-upload/*
+  process_job:
+    handler: loyalty-cards/process_job.handler
+    events:
+      - sqs:
+          arn: arn:aws:sqs:ap-southeast-1:501968831602:loyalty-card-queue
 
 resources:
   Resources:
@@ -48,3 +66,11 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+    # LoyaltyCardUploadBucket:
+    #   Type: AWS::S3::Bucket
+    #   Properties:
+    #     BucketName: loyalty-card-upload-2
+    LoyaltyCardQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: loyalty-card-queue
