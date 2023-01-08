@@ -40,11 +40,6 @@ functions:
           event: s3:ObjectCreated:*
           rules:
             - suffix: .csv
-    iamRoleStatements:
-      - Effect: Allow
-        Action:
-          - s3:GetObject
-        Resource: arn:aws:s3:::loyalty-card-upload/*
   process_job:
     handler: loyalty-cards/process_job.handler
     events:
