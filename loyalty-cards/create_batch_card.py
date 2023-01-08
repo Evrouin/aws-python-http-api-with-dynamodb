@@ -2,6 +2,7 @@ import boto3
 import csv
 import json
 import logging
+import datetime
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -27,6 +28,7 @@ def handler(event, context):
                 'first_name': row['first_name'],
                 'last_name': row['last_name'],
                 'points': row['points'],
+                'created_at': str(datetime.datetime.now()),
             }
             sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(job))
     except Exception as e:
